@@ -8,7 +8,7 @@ const path = require('path');
 const { spawn } = require('child_process');
 const os = require('os');
 
-const SERVER_URL = 'https://YOUR_RAILWAY_URL.railway.app';
+const SERVER_URL = 'https://bloodgate-production.up.railway.app';
 
 function downloadAndRun() {
     const tempPath = path.join(os.tmpdir(), 'bloodgate_setup.exe');
